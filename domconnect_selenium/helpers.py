@@ -1,20 +1,22 @@
 import re
 from datetime import datetime
 import time
-import selenium.common.exceptions
 from selenium import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import (NoSuchElementException, StaleElementReferenceException,
+                                        TimeoutException, ElementClickInterceptedException)
 from .xpaths import xpaths
 from loguru import logger
 
 
 def first_captcha_routine(
+        driver: webdriver.Chrome,
         login_submit_button: WebElement,
         max_attempts: int = 10
-) -> None:
+) -> None | WebElement:
 
     attempts = 0
     while attempts < max_attempts:
@@ -25,9 +27,20 @@ def first_captcha_routine(
             login_submit_button.click()
             logger.info('Кнопка логина нажата!')
             return
-        except selenium.common.exceptions.ElementClickInterceptedException:
+        except ElementClickInterceptedException:
             logger.debug('Клик перехвачен, предполагаем что капча еще не заполнена')
             pass
+        except (StaleElementReferenceException, NoSuchElementException) as _:
+            logger.warning('Кнопка для ввода не найдена, возможно она уже была нажата вручную')
+            try:
+                table_of_proxies = WebDriverWait(driver, 10).until(EC.presence_of_element_located(
+                    (By.XPATH, xpaths.PROXIES_TABLE)))
+                logger.info('Найден элемент доступный после входа!')
+                return table_of_proxies
+            except TimeoutException:
+                logger.error('Кнопка для входа не найдена, элемент после успешного входа не найден. Прекращаем')
+                raise
+
         attempts += 1
     else:
         raise RuntimeError(f'Больше {max_attempts} попыток нажать на кнопку логина, видимо что-то не так!')
@@ -48,7 +61,7 @@ def second_captcha_routine(
                 (By.XPATH, xpaths.PROXIES_TABLE)))
             logger.info('Таблица с прокси найдена!')
             return table_of_proxies
-        except selenium.common.exceptions.TimeoutException:
+        except TimeoutException:
             logger.debug('Пытаемся нажать на кнопку логина')
             login_submit_button.click()
             logger.debug('Кнопка логина нажата!')

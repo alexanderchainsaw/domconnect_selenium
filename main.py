@@ -1,4 +1,3 @@
-import sys
 import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -6,7 +5,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from dotenv import load_dotenv
-import logging
 from domconnect_selenium import xpaths
 from domconnect_selenium import validate_date_time, validate_ip_port, second_captcha_routine, first_captcha_routine
 from loguru import logger
@@ -41,10 +39,9 @@ def main():
         (By.XPATH, xpaths.LOGIN_SUBMIT)))
 
     logger.info('Ожидаем заполнения капчи')
-    first_captcha_routine(login_submit_button)
-
-    logger.info('Ищем элемент после успешного входа в аккаунт (возможна вторая капча)')
-    table_of_proxies = second_captcha_routine(driver, login_submit_button)
+    if not (table_of_proxies := first_captcha_routine(driver, login_submit_button)):
+        logger.info('Ищем элемент после успешного входа в аккаунт (возможна вторая капча)')
+        table_of_proxies = second_captcha_routine(driver, login_submit_button)
 
     result = []
 
@@ -59,7 +56,7 @@ def main():
             raise ValueError(f'Не пройдена валидация: {expiration_date}')
 
         result.append(f"{ip_port} - {expiration_date}")
-        logger.info(f'Успешно собрали данные: {ip_port} - {expiration_date}')
+        logger.success(f'Успешно собрали данные: {ip_port} - {expiration_date}')
 
     for el in result:
         print(el)
