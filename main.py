@@ -44,6 +44,8 @@ def main():
         table_of_proxies = second_captcha_routine(driver, login_submit_button)
 
     result = []
+
+    logger.info('Устанавливаем максимальный размер окна')
     driver.maximize_window()
 
     logger.info('Начинаем поиск нужных данных')
