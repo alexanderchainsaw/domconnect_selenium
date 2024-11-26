@@ -44,6 +44,7 @@ def main():
         table_of_proxies = second_captcha_routine(driver, login_submit_button)
 
     result = []
+    driver.maximize_window()
 
     logger.info('Начинаем поиск нужных данных')
     for row in table_of_proxies.find_elements(By.XPATH, xpaths.PROXIES_TABLE_ELEMENT):
