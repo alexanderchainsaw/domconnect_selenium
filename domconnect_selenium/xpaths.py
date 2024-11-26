@@ -13,6 +13,7 @@ class XPaths:
     PROXIES_TABLE_ELEMENT: str = './/tr[contains(@id,"el-")]'
     IP_PORT: str = ".//div[@class='right clickselect ']"
     EXPIRATION_DATE: str = ".//div[@class='right color-success']"
+    EXPIRATION_DATE_SMALL_WINDOW: str = ".//li[@class='mobile-show']/div[@class='right']"
 
     def __post_init__(self):
         for value in self.__dict__.values():

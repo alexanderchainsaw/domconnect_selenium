@@ -51,9 +51,18 @@ def main():
         expiration_date = row.find_element(By.XPATH, xpaths.EXPIRATION_DATE).text.strip()
 
         if not validate_ip_port(ip_port):
-            raise ValueError(f'Не пройдена валидация: {ip_port}')
+            logger.warning(f'Не пройдена валидация ip_port - {ip_port}')
+
         if not validate_date_time(expiration_date):
-            raise ValueError(f'Не пройдена валидация: {expiration_date}')
+            logger.warning(f'Не пройдена валидация expiration_date {expiration_date}, ищем в другом месте')
+
+            # hotfix
+            expiration_date = row.find_element(By.XPATH, xpaths.EXPIRATION_DATE_SMALL_WINDOW).text.strip()
+            if 'д' in expiration_date:
+                d_index = expiration_date.index('д')
+                expiration_date = expiration_date[d_index + 1:].strip()
+            if not validate_date_time(expiration_date):
+                logger.error(f'Валидация не пройдена повторно expiration_date {expiration_date}')
 
         result.append(f"{ip_port} - {expiration_date}")
         logger.success(f'Успешно собрали данные: {ip_port} - {expiration_date}')
