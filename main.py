@@ -9,8 +9,7 @@ from dotenv import load_dotenv
 import logging
 from domconnect_selenium import xpaths
 from domconnect_selenium import validate_date_time, validate_ip_port, second_captcha_routine, first_captcha_routine
-
-logger = logging.getLogger(__name__)
+from loguru import logger
 
 
 load_dotenv()
@@ -67,5 +66,4 @@ def main():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
     main()
