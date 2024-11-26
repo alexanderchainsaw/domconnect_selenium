@@ -7,7 +7,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from xpaths import xpaths
+from .xpaths import xpaths
 import logging
 
 logger = logging.getLogger(__name__)
