@@ -1,4 +1,5 @@
-from helpers import validate_ip_port, validate_date_time, email, password
+from domconnect_selenium.helpers import validate_date_time, validate_ip_port
+from main import email, password
 
 
 def test_credentials():
