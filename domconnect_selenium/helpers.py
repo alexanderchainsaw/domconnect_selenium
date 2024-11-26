@@ -7,7 +7,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import (NoSuchElementException, StaleElementReferenceException,
-                                        TimeoutException, ElementClickInterceptedException)
+                                        TimeoutException, ElementClickInterceptedException,
+                                        UnexpectedAlertPresentException)
 from .xpaths import xpaths
 from loguru import logger
 
@@ -40,7 +41,6 @@ def first_captcha_routine(
             except TimeoutException:
                 logger.error('Кнопка для входа не найдена, элемент после успешного входа не найден. Прекращаем')
                 raise
-
         attempts += 1
     else:
         raise RuntimeError(f'Больше {max_attempts} попыток нажать на кнопку логина, видимо что-то не так!')
@@ -65,6 +65,9 @@ def second_captcha_routine(
             logger.debug('Пытаемся нажать на кнопку логина')
             login_submit_button.click()
             logger.debug('Кнопка логина нажата!')
+        except UnexpectedAlertPresentException:
+            raise RuntimeError('Попытка войти без прохождения капчи - перезапустите скрипт и заполните капчу')
+        attempts += 1
     else:
         raise RuntimeError(f'Больше {max_attempts} попыток нажать на кнопку логина, '
                            f'видимо что-то не так! (вторая капча)')
